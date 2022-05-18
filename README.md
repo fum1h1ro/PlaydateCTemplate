@@ -21,7 +21,7 @@ rake test                        # Test
 ## configure
 
 - Please specify your game name.
-    - (https://github.com/fum1h1ro/PlaydateCTemplate/blob/master/Rakefile#L3
+    - https://github.com/fum1h1ro/PlaydateCTemplate/blob/master/Rakefile#L3
 
 
 ## usage
