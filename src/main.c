@@ -1,13 +1,6 @@
-//
-//  main.c
-//  Extension
-//
-//  Created by Dave Hayden on 7/30/14.
-//  Copyright (c) 2014 Panic, Inc. All rights reserved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "pd_api.h"
 
@@ -18,31 +11,25 @@ LCDFont* font = NULL;
 
 int eventHandler(PlaydateAPI* pd, PDSystemEvent event, uint32_t arg)
 {
-    (void)arg; // arg is currently only used for event = kEventKeyPressed
-
     if (event == kEventInit)
     {
         const char* err;
         font = pd->graphics->loadFont(fontpath, &err);
 
-        if ( font == NULL )
-            pd->system->error("%s:%i Couldn't load font %s: %s", __FILE__, __LINE__, fontpath, err);
+        if (font == NULL) pd->system->error("%s:%i Couldn't load font %s: %s", __FILE__, __LINE__, fontpath, err);
 
-        // Note: If you set an update callback in the kEventInit handler, the system assumes the game is pure C and doesn't run any Lua code in the game
+        pd->display->setRefreshRate(50);
+
         pd->system->setUpdateCallback(update, pd);
     }
 
     return 0;
 }
 
-
-#define TEXT_WIDTH 86
-#define TEXT_HEIGHT 16
-
-int x = (400-TEXT_WIDTH)/2;
-int y = (240-TEXT_HEIGHT)/2;
-int dx = 1;
-int dy = 2;
+const char* text = "HELLO Playdate WORLD!";
+const float d2r = (M_PI * 2.0f) / 180.0f;
+float angle = 0.0f;
+const float seconds = 2.0f;
 
 static int update(void* userdata)
 {
@@ -50,19 +37,19 @@ static int update(void* userdata)
 
     pd->graphics->clear(kColorWhite);
     pd->graphics->setFont(font);
-    pd->graphics->drawText("Hello @orld!", strlen("Hello World!"), kASCIIEncoding, x, y);
 
-    x += dx;
-    y += dy;
+    int cx = pd->display->getWidth() / 2;
+    int cy = pd->display->getHeight() / 2;
+    int tw = pd->graphics->getTextWidth(font, text, strlen(text), kASCIIEncoding, 0) / 2;
 
-    if ( x < 0 || x > LCD_COLUMNS - TEXT_WIDTH )
-        dx = -dx;
+    int x = cx + (int)(cos(angle * d2r) * 32);
+    int y = cy - (int)(sin(angle * d2r) * 32);
+    pd->graphics->drawText(text, strlen(text), kASCIIEncoding, x - tw, y);
 
-    if ( y < 0 || y > LCD_ROWS - TEXT_HEIGHT )
-        dy = -dy;
+    angle += ((360.0f / seconds) / 50.0f);
 
 #ifndef NDEBUG
-    pd->system->drawFPS(0,0);
+    pd->system->drawFPS(0, 0);
 #endif
 
     return 1;
