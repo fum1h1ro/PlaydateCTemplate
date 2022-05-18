@@ -17,3 +17,20 @@ rake run                         # Run on Simulator
 rake test                        # Test
 ```
 
+
+## configure
+
+[Please specify your game name]*(https://github.com/fum1h1ro/PlaydateCTemplate/blob/master/Rakefile#L3).
+
+
+## usage
+
+1. `rake (clean|clobber)`
+2. `rake generate:simulator:(debug|release)`
+3. `rake build`
+4. `rake run`
+5. `rake test`
+    - only for `simulator:debug`
+5. `rake (clean|clobber)`
+6. `rake generate:device:(debug|release)`
+
