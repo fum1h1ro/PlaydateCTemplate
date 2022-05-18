@@ -1,5 +1,6 @@
 # Simple Template for C_API
 
+![sample](can_delete/record_sample.gif)
 
 
 ## rake tasks
