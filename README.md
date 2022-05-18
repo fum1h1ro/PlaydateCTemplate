@@ -4,6 +4,7 @@
 
 ## rake tasks
 
+```
 rake build                       # Build
 rake clean                       # Remove any temporary products
 rake clobber                     # Remove any generated files
@@ -14,4 +15,5 @@ rake generate:simulator:release  # Generate Makefile (simulator, Release)
 rake generate:xcode:simulator    # Generate Xcode project (simulator)
 rake run                         # Run on Simulator
 rake test                        # Test
+```
 
