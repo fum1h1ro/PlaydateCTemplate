@@ -1,0 +1,9 @@
+-I.
+-I/Users/k-ya/devtools/PlaydateSDK/C_API
+-DTARGET_EXTENSION=1
+-DTARGET_SIMULATOR=1
+-Wall
+-Wstrict-prototypes
+-Wno-unknown-pragmas
+-std=gnu11
+
