@@ -4,16 +4,16 @@ set(CMAKE_C_STANDARD 11)
 set(ENVSDK $ENV{PLAYDATE_SDK_PATH})
 
 if (NOT ${ENVSDK} STREQUAL "")
-	# Convert path from Windows
-	file(TO_CMAKE_PATH ${ENVSDK} SDK)
+    # Convert path from Windows
+    file(TO_CMAKE_PATH ${ENVSDK} SDK)
 else()
-	execute_process(
-			COMMAND bash -c "egrep '^\\s*SDKRoot' $HOME/.Playdate/config"
-			COMMAND head -n 1
-			COMMAND cut -c9-
-			OUTPUT_VARIABLE SDK
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
+    execute_process(
+        COMMAND bash -c "egrep '^\\s*SDKRoot' $HOME/.Playdate/config"
+        COMMAND head -n 1
+        COMMAND cut -c9-
+        OUTPUT_VARIABLE SDK
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 endif()
 
 if (NOT EXISTS ${SDK})
@@ -30,18 +30,23 @@ set(PLAYDATE_GAME_DEVICE ${GAME_NAME}_DEVICE)
 
 project(${PLAYDATE_GAME_NAME} C ASM)
 
-
-file(GLOB SOURCE src/*.c)
+file(GLOB SOURCE src/*.c src/**/*.c)
 
 if (TOOLCHAIN STREQUAL "armgcc")
     add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c ${SOURCE})
 else()
     add_library(${PLAYDATE_GAME_NAME} SHARED ${SOURCE})
 
-    enable_testing()
+    file(GLOB PD_SOURCE src/pd/*.c)
     file(GLOB TEST_SOURCE test/*.c)
-    add_executable(test_${PLAYDATE_GAME_NAME} ${TEST_SOURCE})
-    add_test(NAME run_test COMMAND test_${PLAYDATE_GAME_NAME})
+
+    enable_testing()
+    add_compile_options(-D UNIT_TEST)
+    foreach(test_src IN ITEMS ${TEST_SOURCE})
+        get_filename_component(TEST_NAME ${test_src} NAME_WE)
+        add_executable(${TEST_NAME} ${PD_SOURCE} ${test_src})
+        add_test(NAME ${test_src} COMMAND ${TEST_NAME})
+    endforeach()
 endif()
 
 
