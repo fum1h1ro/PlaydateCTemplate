@@ -27,16 +27,27 @@ rake test                        # Test
 
 - Please specify your game name.
     - https://github.com/fum1h1ro/PlaydateCTemplate/blob/master/Rakefile#L3
+    - https://github.com/fum1h1ro/PlaydateCTemplate/blob/master/Source/pdxinfo
 
 
 ## usage
 
-1. `rake (clean|clobber)`
-2. `rake generate:simulator:(debug|release)`
-3. `rake build`
+1. delete working directory
+    - `rake clean`
+    - `rake clobber` # delete pdx
+2. generate Makefile for Playdate Simulator
+    - `rake generate:simulator:debug`
+    - `rake generate:simulator:release`
+3. build
+    - `rake build:simulator:debug`
+    - `rake build:simulator:release`
 4. `rake run`
 5. `rake test`
     - depends on `generate:simulator:debug`
-6. `rake generate:device:(debug|release)`
-6. `rake build:device:(debug|release)`
+6. generate Makefile for Playdate
+    - `rake generate:device:debug`
+    - `rake generate:device:release`
+7. build
+    -`rake build:device:debug`
+    -`rake build:device:release`
 

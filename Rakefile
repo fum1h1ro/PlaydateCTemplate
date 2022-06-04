@@ -16,14 +16,14 @@ def get_sdk_root()
 end
 
 SDK_ROOT = get_sdk_root()
-PLAYDATE_SIMULATOR = "#{SDK_ROOT}/bin/Playdate Simulator.app"#/Contents/MacOS/Playdate Simulator"
+PLAYDATE_SIMULATOR = "#{SDK_ROOT}/bin/Playdate Simulator.app"
 BUILD_DIR = 'build_dir'
 PDX_FILE = FileList["*.pdx"]
 
 directory BUILD_DIR
 
 CLEAN.include(BUILD_DIR)
-CLEAN.include('source/pdex.*')
+CLEAN.include('Source/pdex.*')
 CLOBBER.include(PDX_FILE)
 
 
