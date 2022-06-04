@@ -6,14 +6,18 @@
 ## rake tasks
 
 ```
-rake build                       # Build
+rake build                       # Build all
+rake build:device:debug          # Build (device, debug)
+rake build:device:release        # Build (device, release)
+rake build:simulator:debug       # Build (simulator, debug)
+rake build:simulator:release     # Build (simulator, release)
 rake clean                       # Remove any temporary products
 rake clobber                     # Remove any generated files
-rake generate:device:debug       # Generate Makefile (device, Debug)
-rake generate:device:release     # Generate Makefile (device, Release)
-rake generate:simulator:debug    # Generate Makefile (simulator, Debug)
-rake generate:simulator:release  # Generate Makefile (simulator, Release)
-rake generate:xcode:simulator    # Generate Xcode project (simulator)
+rake generate:device:debug       # Generate Makefile (device, debug)
+rake generate:device:release     # Generate Makefile (device, release)
+rake generate:simulator:debug    # Generate Makefile (simulator, debug)
+rake generate:simulator:release  # Generate Makefile (simulator, release)
+rake generate:xcode              # Generate Xcode project (xcode)
 rake run                         # Run on Simulator
 rake test                        # Test
 ```
@@ -32,7 +36,7 @@ rake test                        # Test
 3. `rake build`
 4. `rake run`
 5. `rake test`
-    - only for `simulator:debug`
-5. `rake (clean|clobber)`
+    - depends on `generate:simulator:debug`
 6. `rake generate:device:(debug|release)`
+6. `rake build:device:(debug|release)`
 
