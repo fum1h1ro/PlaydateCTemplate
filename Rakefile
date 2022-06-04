@@ -28,22 +28,39 @@ CLOBBER.include(PDX_FILE)
 
 
 def define_cmake_make_task(target, type, option)
-  desc "Generate Makefile (#{target}, #{type})"
-  task type.downcase => BUILD_DIR do |t|
-    cd t.source
-    sh "cmake .. -DGAME_NAME=#{GAME_NAME} -DCMAKE_BUILD_TYPE=#{type} #{option}"
+  build_dir = "#{BUILD_DIR}/#{target}/#{type.downcase}"
+  directory build_dir
+  desc "Generate Makefile (#{target}, #{type.downcase})"
+  task type.downcase => build_dir do |t|
+    cd t.source do
+      unless File.exists?('Makefile')
+        sh "cmake ../../.. -DGAME_NAME=#{GAME_NAME} -DCMAKE_BUILD_TYPE=#{type} #{option}"
+      end
+    end
   end
 end
 
 def define_cmake_xcode_task(target, option)
+  build_dir = "#{BUILD_DIR}/#{target}/xcode"
+  directory build_dir
   desc "Generate Xcode project (#{target})"
-  task target.downcase => BUILD_DIR do |t|
-    cd t.source
-    sh "cmake .. -DGAME_NAME=#{GAME_NAME} #{option} -G Xcode"
-    sh "open ."
+  task target.downcase => build_dir do |t|
+    cd t.source do
+      sh "cmake ../../.. -DGAME_NAME=#{GAME_NAME} #{option} -G Xcode"
+      sh "open ."
+    end
   end
 end
 
+def define_build_task(target, type)
+  build_dir = "#{BUILD_DIR}/#{target}/#{type.downcase}"
+  desc "Build (#{target}, #{type.downcase})"
+  task type.downcase => "generate:#{target}:#{type.downcase}" do |t|
+    cd build_dir do
+      sh "make"
+    end
+  end
+end
 
 namespace :generate do
   namespace :simulator do
@@ -55,16 +72,20 @@ namespace :generate do
     define_cmake_make_task('device', 'Release', "-DCMAKE_TOOLCHAIN_FILE=#{SDK_ROOT}/C_API/buildsupport/arm.cmake")
   end
 
-  namespace :xcode do
-    define_cmake_xcode_task('simulator', "")
-    #define_cmake_xcode_task('device', "-DCMAKE_TOOLCHAIN_FILE=#{SDK_ROOT}/C_API/buildsupport/arm.cmake")
-  end
+  define_cmake_xcode_task('xcode', "")
+  #define_cmake_xcode_task('device', "-DCMAKE_TOOLCHAIN_FILE=#{SDK_ROOT}/C_API/buildsupport/arm.cmake")
 end
 
 desc "Build"
-task :build do
-  cd BUILD_DIR
-  sh "make"
+namespace :build do
+  namespace :simulator do
+    define_build_task('simulator', 'Debug')
+    define_build_task('simulator', 'Release')
+  end
+  namespace :device do
+    define_build_task('device', 'Debug')
+    define_build_task('device', 'Release')
+  end
 end
 
 desc "Run on Simulator"
@@ -73,7 +94,8 @@ task :run do
 end
 
 desc "Test"
-task :test do
-  cd BUILD_DIR
-  sh "make test"
+task :test => "build:simulator:debug" do
+  cd "#{BUILD_DIR}/simulator/debug" do
+    sh "make test"
+  end
 end
