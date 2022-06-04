@@ -48,6 +48,6 @@ rake test                        # Test
     - `rake generate:device:debug`
     - `rake generate:device:release`
 7. build
-    -`rake build:device:debug`
-    -`rake build:device:release`
+    - `rake build:device:debug`
+    - `rake build:device:release`
 
