@@ -88,6 +88,22 @@ namespace :build do
   end
 end
 
+desc "Build all"
+task :build do
+  if Dir.exists?(BUILD_DIR)
+    ['simulator', 'device'].each do |target|
+      ['debug', 'release'].each do |type|
+        dir = "#{BUILD_DIR}/#{target}/#{type}"
+        if Dir.exists?(dir)
+          cd dir do
+            sh "make"
+          end
+        end
+      end
+    end
+  end
+end
+
 desc "Run on Simulator"
 task :run do
   sh "open \"#{PLAYDATE_SIMULATOR}\" #{PDX_FILE}"
