@@ -17,20 +17,26 @@ else()
 endif()
 
 if (NOT EXISTS ${SDK})
-	message(FATAL_ERROR "SDK Path not found; set ENV value PLAYDATE_SDK_PATH")
-	return()
+    message(FATAL_ERROR "SDK Path not found; set ENV value PLAYDATE_SDK_PATH")
+    return()
 endif()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 set(CMAKE_XCODE_GENERATE_SCHEME TRUE)
 
-# Game Name Customization
 set(PLAYDATE_GAME_NAME ${GAME_NAME})
 set(PLAYDATE_GAME_DEVICE ${GAME_NAME}_DEVICE)
 
 project(${PLAYDATE_GAME_NAME} C ASM)
 
-file(GLOB SOURCE src/*.c src/**/*.c)
+function(print_list)
+  foreach(msg ${ARGV})
+    message("${msg}")
+  endforeach()
+endfunction()
+
+file(GLOB_RECURSE SOURCE RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/src" src/*.c)
+list(TRANSFORM SOURCE PREPEND "src/")
 
 if (TOOLCHAIN STREQUAL "armgcc")
     add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c ${SOURCE})
@@ -39,7 +45,6 @@ else()
 
     enable_testing()
 
-    #file(GLOB PD_SOURCE src/**/*.c)
     list(FILTER SOURCE EXCLUDE REGEX "main\\.c$")
     file(GLOB TEST_SOURCE test/*.c)
 
