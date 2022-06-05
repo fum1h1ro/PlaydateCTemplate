@@ -1,6 +1,6 @@
 require 'rake/clean'
 
-GAME_NAME = 'my_first_game'
+GAME_NAME = 'c_template'
 
 
 def get_sdk_root()
@@ -57,6 +57,9 @@ def define_build_task(target, type)
   desc "Build (#{target}, #{type.downcase})"
   task type.downcase => "generate:#{target}:#{type.downcase}" do |t|
     cd build_dir do
+      FileList['*.dylib', '*.elf'].each do |binfile|
+        rm_f binfile
+      end
       sh "make"
     end
   end
