@@ -115,6 +115,15 @@ end
 desc "Test"
 task :test => "build:simulator:debug" do
   cd "#{BUILD_DIR}/simulator/debug" do
-    sh "make test"
+    begin
+      sh "make test"
+    rescue
+      print("================================================================================\n")
+      File.read("Testing/Temporary/LastTest.log").each_line do |l|
+        print(l)
+      end
+      print("================================================================================\n")
+      raise
+    end
   end
 end
