@@ -1,4 +1,5 @@
 -I.
+-Isrc
 -I/Users/k-ya/devtools/PlaydateSDK/C_API
 -DTARGET_EXTENSION=1
 -DTARGET_SIMULATOR=1
