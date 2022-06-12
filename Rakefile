@@ -16,9 +16,11 @@ def get_sdk_root()
 end
 
 SDK_ROOT = get_sdk_root()
+PDC = "#{SDK_ROOT}/bin/pdc"
 PLAYDATE_SIMULATOR = "#{SDK_ROOT}/bin/Playdate Simulator.app"
 BUILD_DIR = 'build_dir'
 PDX_FILE = FileList["*.pdx"]
+LUA_FILES = FileList["Source/**/*.lua"]
 
 directory BUILD_DIR
 
@@ -60,10 +62,17 @@ def define_build_task(target, type)
       FileList['*.dylib', '*.elf'].each do |binfile|
         rm_f binfile
       end
+      sh "rake #{GAME_NAME}.pdx"
       sh "make"
     end
   end
 end
+
+file "#{GAME_NAME}.pdx" => LUA_FILES do |f|
+  sh "#{PDC} -sdkpath #{SDK_ROOT} Source #{f.name}"
+end
+
+
 
 namespace :generate do
   namespace :simulator do
@@ -98,9 +107,7 @@ task :build do
       ['debug', 'release'].each do |type|
         dir = "#{BUILD_DIR}/#{target}/#{type}"
         if Dir.exists?(dir)
-          cd dir do
-            sh "make"
-          end
+          sh "rake build:#{target}:#{type}"
         end
       end
     end
