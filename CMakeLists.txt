@@ -40,8 +40,10 @@ list(TRANSFORM SOURCE PREPEND "src/")
 
 if (TOOLCHAIN STREQUAL "armgcc")
     add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c ${SOURCE})
+    target_compile_options(${PLAYDATE_GAME_DEVICE} PUBLIC -save-temps=obj -v)
 else()
     add_library(${PLAYDATE_GAME_NAME} SHARED ${SOURCE})
+    #target_compile_options(${PLAYDATE_GAME_NAME} PUBLIC -S)
 
     enable_testing()
 
