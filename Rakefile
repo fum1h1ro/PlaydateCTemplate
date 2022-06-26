@@ -1,7 +1,6 @@
 require 'rake/clean'
 
-GAME_NAME = 'c_template'
-
+PDXINFO_FILE = 'Source/pdxinfo'
 
 def get_sdk_root()
   env = ENV['PLAYDATE_SDK_PATH']
@@ -15,12 +14,23 @@ def get_sdk_root()
   raise RuntimeError.new('cannot found SDK')
 end
 
+def load_pdxinfo()
+  pdxinfo = {}
+  File.read(PDXINFO_FILE).each_line do |x|
+    pair = x.chomp.split(/=/, 2)
+    pdxinfo[pair[0]] = pair[1]
+  end
+  pdxinfo
+end
+
+PDXINFO = load_pdxinfo()
 SDK_ROOT = get_sdk_root()
 PDC = "#{SDK_ROOT}/bin/pdc"
 PLAYDATE_SIMULATOR = "#{SDK_ROOT}/bin/Playdate Simulator.app"
 BUILD_DIR = 'build_dir'
 PDX_FILE = FileList["*.pdx"]
 LUA_FILES = FileList["Source/**/*.lua"]
+GAME_NAME = PDXINFO['name'].gsub(/\s/, '_')
 
 directory BUILD_DIR
 
