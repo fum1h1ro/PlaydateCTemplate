@@ -28,18 +28,28 @@ SDK_ROOT = get_sdk_root()
 PDC = "#{SDK_ROOT}/bin/pdc"
 PLAYDATE_SIMULATOR = "#{SDK_ROOT}/bin/Playdate Simulator.app"
 BUILD_DIR = 'build_dir'
-PDX_FILE = FileList["*.pdx"]
+PDX_FILES = FileList["*.pdx"]
 LUA_FILES = FileList["Source/**/*.lua"]
 GAME_NAME = PDXINFO['name'].gsub(/\s/, '_')
+BUILD_TARGETS = ['Simulator', 'Device']
+BUILD_TYPES = ['Debug', 'Release']
 
 directory BUILD_DIR
 
 CLEAN.include(BUILD_DIR)
 CLEAN.include('Source/pdex.*')
-CLOBBER.include(PDX_FILE)
+CLOBBER.include(PDX_FILES)
 
 def make_game_name(type)
   "#{GAME_NAME}_#{type.downcase}"
+end
+
+def all_targets_and_types(&block)
+  BUILD_TARGETS.each do |target|
+    BUILD_TYPES.each do |type|
+      block.call(target.downcase, type.downcase)
+    end
+  end
 end
 
 def define_cmake_make_task(target, type, option)
@@ -81,16 +91,11 @@ def define_build_task(target, type)
   end
 end
 
-
-['Simulator', 'Device'].each do |target|
-  ['Debug', 'Release'].each do |type|
-    file "#{make_game_name(type)}.pdx" => LUA_FILES do |f|
-      sh "#{PDC} -sdkpath #{SDK_ROOT} Source #{f.name}"
-    end
+BUILD_TYPES.each do |type|
+  file "#{make_game_name(type)}.pdx" => LUA_FILES do |f|
+    sh "#{PDC} -sdkpath #{SDK_ROOT} Source #{f.name}"
   end
 end
-
-
 
 namespace :generate do
   namespace :simulator do
@@ -118,21 +123,23 @@ end
 
 desc "Build all"
 task :build do
-  if Dir.exists?(BUILD_DIR)
-    ['simulator', 'device'].each do |target|
-      ['debug', 'release'].each do |type|
-        dir = "#{BUILD_DIR}/#{target}/#{type}"
-        if Dir.exists?(dir)
-          sh "rake build:#{target}:#{type}"
-        end
-      end
+  all_targets_and_types do |target, type|
+    dir = "#{BUILD_DIR}/#{target}/#{type}"
+    if Dir.exists?(dir)
+      sh "rake build:#{target}:#{type}"
     end
   end
 end
 
-desc "Run on Simulator"
-task :run do
-  sh "open \"#{PLAYDATE_SIMULATOR}\" #{PDX_FILE}"
+namespace :run do
+  desc "Run on Simulator(Debug)"
+  task :debug do
+    sh "open \"#{PLAYDATE_SIMULATOR}\" #{make_game_name('Debug')}.pdx"
+  end
+  desc "Run on Simulator"
+  task :release do
+    sh "open \"#{PLAYDATE_SIMULATOR}\" #{make_game_name('Release')}.pdx"
+  end
 end
 
 desc "Test"
