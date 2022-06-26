@@ -38,6 +38,9 @@ CLEAN.include(BUILD_DIR)
 CLEAN.include('Source/pdex.*')
 CLOBBER.include(PDX_FILE)
 
+def make_game_name(type)
+  "#{GAME_NAME}_#{type.downcase}"
+end
 
 def define_cmake_make_task(target, type, option)
   build_dir = "#{BUILD_DIR}/#{target}/#{type.downcase}"
@@ -46,7 +49,7 @@ def define_cmake_make_task(target, type, option)
   task type.downcase => build_dir do |t|
     cd t.source do
       unless File.exists?('Makefile')
-        sh "cmake ../../.. -DGAME_NAME=#{GAME_NAME} -DCMAKE_BUILD_TYPE=#{type} #{option}"
+        sh "cmake ../../.. -DGAME_NAME=#{make_game_name(type)} -DCMAKE_BUILD_TYPE=#{type} #{option}"
       end
     end
   end
@@ -58,7 +61,7 @@ def define_cmake_xcode_task(target, option)
   desc "Generate Xcode project (#{target})"
   task target.downcase => build_dir do |t|
     cd t.source do
-      sh "cmake ../../.. -DGAME_NAME=#{GAME_NAME} #{option} -G Xcode"
+      sh "cmake ../../.. -DGAME_NAME=#{make_game_name('xcode')} #{option} -G Xcode"
       sh "open ."
     end
   end
@@ -72,14 +75,19 @@ def define_build_task(target, type)
       FileList['*.dylib', '*.elf'].each do |binfile|
         rm_f binfile
       end
-      sh "rake #{GAME_NAME}.pdx"
+      sh "rake #{make_game_name(type)}.pdx"
       sh "make"
     end
   end
 end
 
-file "#{GAME_NAME}.pdx" => LUA_FILES do |f|
-  sh "#{PDC} -sdkpath #{SDK_ROOT} Source #{f.name}"
+
+['Simulator', 'Device'].each do |target|
+  ['Debug', 'Release'].each do |type|
+    file "#{make_game_name(type)}.pdx" => LUA_FILES do |f|
+      sh "#{PDC} -sdkpath #{SDK_ROOT} Source #{f.name}"
+    end
+  end
 end
 
 
